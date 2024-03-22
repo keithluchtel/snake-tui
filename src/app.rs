@@ -7,13 +7,20 @@ use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::backend::CrosstermBackend;
 use ratatui::{Frame, Terminal};
 use ratatui::buffer::Buffer;
-use ratatui::layout::{Rect};
-use ratatui::prelude::{Widget};
+use ratatui::layout::{Alignment, Rect};
+use ratatui::prelude::{Marker, Widget};
+use ratatui::symbols::border;
+use ratatui::widgets::{Block, Borders};
+use ratatui::widgets::block::Title;
+use ratatui::widgets::canvas::Canvas;
 use crate::app::board::Board;
+use crate::app::snake::Snake;
 
 #[derive(Debug, Default)]
 pub struct App {
-    exit: bool
+    exit: bool,
+    board: Board,
+    snake: Snake
 }
 impl App {
     pub fn run(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> anyhow::Result<()> {
@@ -56,6 +63,21 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) where Self: Sized {
-        Board::default().render(area, buf);
+        let title = Title::from("hello player");
+        let block = Block::default()
+            .title(title.alignment(Alignment::Center))
+            .borders(Borders::ALL)
+            .border_set(border::THICK);
+        
+        Canvas::default()
+            .x_bounds([0.0, area.width as f64])
+            .y_bounds([0.0, area.height as f64])
+            .marker(Marker::HalfBlock)
+            .paint(|ctx| {
+                ctx.draw(&self.board);
+                ctx.draw(&self.snake);
+            })
+            .block(block)
+            .render(area, buf);
     }
 }

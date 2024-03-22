@@ -1,11 +1,10 @@
-use ratatui::buffer::Buffer;
-use ratatui::layout::Rect;
-use ratatui::prelude::Widget;
+use ratatui::widgets::canvas::{Painter, Shape};
 
 #[derive(Debug, Default)]
 pub struct Snake {}
 
-impl Widget for Snake {
-    fn render(self, area: Rect, buf: &mut Buffer) {
+impl Shape for Snake {
+    fn draw(&self, _: &mut Painter) {
+
     }
 }

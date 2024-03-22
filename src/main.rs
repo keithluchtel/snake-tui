@@ -10,8 +10,6 @@ use crossterm::{
 };
 use ratatui::{prelude::{CrosstermBackend, Terminal}, };
 use std::io::{stdout};
-use ratatui::prelude::{Widget};
-use ratatui::widgets::{block::*, *};
 use crate::app::App;
 
 fn close_application() -> Result<()> {
