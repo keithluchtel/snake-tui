@@ -71,6 +71,7 @@ impl Board {
         self.snake.move_snake(self.direction);
         if self.check_target() {
             self.update_target();
+            self.snake.grow();
         }
     }
 
