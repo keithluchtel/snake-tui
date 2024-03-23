@@ -13,8 +13,7 @@ use ratatui::symbols::border;
 use ratatui::widgets::{Block, Borders};
 use ratatui::widgets::block::Title;
 use ratatui::widgets::canvas::Canvas;
-use crate::app::board::Board;
-use crate::app::snake::Snake;
+use crate::app::board::{Board, Direction};
 
 #[derive(Debug, Default)]
 pub struct App {
@@ -36,7 +35,7 @@ impl App {
     }
 
     fn handle_events(&mut self) -> anyhow::Result<()> {
-        if event::poll(std::time::Duration::from_millis(500))? {
+        if event::poll(std::time::Duration::from_millis(100))? {
             match event::read()? {
                 Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
                     self.handle_key_event(key_event)
@@ -52,13 +51,17 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
+            KeyCode::Char('h') => self.board.set_direction(Direction::Left),
+            KeyCode::Char('j') => self.board.set_direction(Direction::Down),
+            KeyCode::Char('k') => self.board.set_direction(Direction::Up),
+            KeyCode::Char('l') => self.board.set_direction(Direction::Right),
             _ => {}
         }
     }
 
     fn handle_tick_event(&mut self) {
         self.board.process_tick();
-        
+
         if self.board.check_collisions() {
             self.exit();
         }

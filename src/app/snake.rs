@@ -1,5 +1,6 @@
 use ratatui::prelude::Color;
 use ratatui::widgets::canvas::{Painter, Shape};
+use crate::app::board::Direction;
 
 #[derive(Debug)]
 pub struct Snake {
@@ -28,10 +29,16 @@ impl Snake {
     pub fn head(&self) -> Option<&(f64, f64)> {
         self.points.get(0)
     }
-    pub fn move_snake(&mut self) {
+    pub fn move_snake(&mut self, direction: Direction) {
         let popped = self.points.pop();
         if let Some(popped) = popped {
-            self.points.push((popped.0, popped.1 + 1.0));
+            let delta = match direction {
+                Direction::Up => (0.0, 1.0),
+                Direction::Down => (0.0, -1.0),
+                Direction::Left => (-1.0, 0.0),
+                Direction::Right => (1.0, 0.0),
+            };
+            self.points.push((popped.0 + delta.0, popped.1 + delta.1));
         }
     }
 }
