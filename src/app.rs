@@ -20,7 +20,6 @@ use crate::app::snake::Snake;
 pub struct App {
     exit: bool,
     board: Board,
-    snake: Snake
 }
 impl App {
     pub fn run(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> anyhow::Result<()> {
@@ -32,7 +31,7 @@ impl App {
         Ok(())
     }
 
-    fn render_frame(&self, frame: &mut Frame) {
+    fn render_frame(&mut self, frame: &mut Frame) {
         frame.render_widget(self, frame.size());
     }
 
@@ -46,6 +45,7 @@ impl App {
             }
         }
 
+        self.handle_tick_event();
         Ok(())
     }
 
@@ -56,26 +56,32 @@ impl App {
         }
     }
 
+    fn handle_tick_event(&mut self) {
+        self.board.process_tick();
+    }
+
     fn exit(&mut self) {
         self.exit = true;
     }
 }
 
-impl Widget for &App {
+impl Widget for &mut App {
     fn render(self, area: Rect, buf: &mut Buffer) where Self: Sized {
-        let title = Title::from("hello player");
+        let title = Title::from(" Snake ");
         let block = Block::default()
             .title(title.alignment(Alignment::Center))
             .borders(Borders::ALL)
             .border_set(border::THICK);
-        
+
+        self.board.x_bounds = [0, i32::from(area.width)];
+        self.board.y_bounds = [0, i32::from(2 * area.height)];
+
         Canvas::default()
-            .x_bounds([0.0, area.width as f64])
-            .y_bounds([0.0, area.height as f64])
             .marker(Marker::HalfBlock)
+            .x_bounds([self.board.x_bounds[0] as f64, self.board.x_bounds[1] as f64])
+            .y_bounds([self.board.y_bounds[0] as f64, self.board.y_bounds[1] as f64])
             .paint(|ctx| {
                 ctx.draw(&self.board);
-                ctx.draw(&self.snake);
             })
             .block(block)
             .render(area, buf);
