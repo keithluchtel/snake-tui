@@ -19,7 +19,9 @@ struct Target {
 
 impl Shape for Target {
     fn draw(&self, painter: &mut Painter) {
-        painter.paint(self.point[0] as usize, self.point[1] as usize, Color::Blue);
+        if let Some((x, y)) = painter.get_point(self.point[0] as f64, self.point[1] as f64) {
+            painter.paint(x, y, Color::Blue);
+        }
     }
 }
 
@@ -50,12 +52,26 @@ impl Shape for Board {
 }
 
 impl Board {
+    fn check_target(&mut self) -> bool {
+        let head = self.snake.head();
+        if let (Some(head), Some(target)) = (head, self.target.as_ref()) {
+            if head.0 as i32 == target.point[0] && head.1 as i32 == target.point[1] {
+                return true
+            }
+        }
+
+        false
+    }
+
     pub fn update_target(&mut self) {
         self.target = Some(Target::new(&self.x_bounds, &self.y_bounds));
     }
 
     pub fn process_tick(&mut self) {
         self.snake.move_snake(self.direction);
+        if self.check_target() {
+            self.update_target();
+        }
     }
 
     pub fn set_direction(&mut self, direction: Direction) {
@@ -66,11 +82,11 @@ impl Board {
         let snake_head = self.snake.head();
         if let Some(head) = snake_head {
             match head {
-                (x, _) if *x <= f64::from(self.x_bounds[0]) => return true,
-                (x, _) if *x >= f64::from(self.x_bounds[1]) => return true,
-                (x, _) if *x >= f64::from(self.x_bounds[1]) => return true,
-                (_, y) if *y <= f64::from(self.y_bounds[0]) => return true,
-                (_, y) if *y >= f64::from(self.y_bounds[1]) => return true,
+                (x, _) if *x <= self.x_bounds[0] => return true,
+                (x, _) if *x >= self.x_bounds[1] => return true,
+                (x, _) if *x >= self.x_bounds[1] => return true,
+                (_, y) if *y <= self.y_bounds[0] => return true,
+                (_, y) if *y >= self.y_bounds[1] => return true,
                 _ => {}
             }
         }
