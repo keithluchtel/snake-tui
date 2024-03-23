@@ -15,12 +15,21 @@ use ratatui::widgets::block::Title;
 use ratatui::widgets::canvas::Canvas;
 use crate::app::board::{Board, Direction};
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App {
     exit: bool,
+    paused: bool,
     board: Board,
 }
+
 impl App {
+    pub fn new() -> Self {
+        Self {
+            exit: false,
+            paused: true,
+            board: Default::default()
+        }
+    }
     pub fn run(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> anyhow::Result<()> {
 
         while !self.exit {
@@ -51,6 +60,10 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
+            KeyCode::Enter => {
+                self.board.update_target();
+                self.paused = false
+            },
             KeyCode::Char('h') => self.board.set_direction(Direction::Left),
             KeyCode::Char('j') => self.board.set_direction(Direction::Down),
             KeyCode::Char('k') => self.board.set_direction(Direction::Up),
@@ -60,10 +73,12 @@ impl App {
     }
 
     fn handle_tick_event(&mut self) {
-        self.board.process_tick();
+        if !self.paused {
+            self.board.process_tick();
 
-        if self.board.check_collisions() {
-            self.exit();
+            if self.board.check_collisions() {
+                self.exit();
+            }
         }
     }
 

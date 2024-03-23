@@ -24,7 +24,7 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
-    let app_result = App::default().run(&mut terminal);
+    let app_result = App::new().run(&mut terminal);
 
     close_application()?;
 
