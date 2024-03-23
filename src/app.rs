@@ -58,6 +58,10 @@ impl App {
 
     fn handle_tick_event(&mut self) {
         self.board.process_tick();
+        
+        if self.board.check_collisions() {
+            self.exit();
+        }
     }
 
     fn exit(&mut self) {

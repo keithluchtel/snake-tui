@@ -25,10 +25,13 @@ impl Shape for Snake {
 }
 
 impl Snake {
+    pub fn head(&self) -> Option<&(f64, f64)> {
+        self.points.get(0)
+    }
     pub fn move_snake(&mut self) {
         let popped = self.points.pop();
         if let Some(popped) = popped {
-            self.points.push((popped.0 + 1.0, popped.1));
+            self.points.push((popped.0, popped.1 + 1.0));
         }
     }
 }
